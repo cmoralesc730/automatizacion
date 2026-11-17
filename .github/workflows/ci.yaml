@@ -37,3 +37,21 @@ jobs:
 
       - name: Pruebas unitarias y de API
         run: python -m pytest tests -v
+
+  secretos:
+    name: Escaneo de secretos
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener el código con todo el historial
+        uses: actions/checkout@v5
+        with:
+          # Un secreto borrado en un commit posterior sigue en el historial: hay que revisarlo completo
+          fetch-depth: 0
+
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # El token del pipeline es de solo lectura; los comentarios en el PR los hará n8n
+          GITLEAKS_ENABLE_COMMENTS: false
